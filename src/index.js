@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import express from "express";
 import bodyParser from "body-parser";
 import graphqlHttp from "express-graphql";
@@ -5,10 +6,9 @@ import mongoose from "mongoose";
 import { buildSchema } from "graphql";
 
 import config from "../config/config";
+import Dish from "../models/dish";
 
 const app = express();
-
-const dishes = [];
 
 app.use(bodyParser.json());
 app.use(
@@ -42,16 +42,34 @@ app.use(
       }
     `),
     rootValue: {
-      dishes: () => dishes,
+      dishes: () =>
+        Dish.find()
+          .then(dishes =>
+            dishes.map(dish => ({
+              ...dish._doc,
+              _id: dish._doc._id.toString()
+            }))
+          )
+          .catch(err => {
+            throw err;
+          }),
       createDish: args => {
-        const newDish = {
-          _id: Math.random().toString(),
+        const dish = new Dish({
           name: args.dishInput.name,
           description: args.dishInput.description,
           price: +args.dishInput.price
-        };
-        dishes.push(newDish);
-        return newDish;
+        });
+        dish
+          .save()
+          .then(result => ({
+            ...result._doc,
+            _id: dish._doc._id.toString()
+          }))
+          .catch(err => {
+            throw err;
+          });
+
+        return dish;
       }
     },
     graphiql: true
@@ -62,5 +80,5 @@ mongoose
   .connect(config.DATABASE_CLUSTER_URL, { useNewUrlParser: true })
   .then(() => app.listen(3000))
   .catch(err => {
-    throw new Error(err);
+    throw err;
   });

@@ -7,5 +7,7 @@ export default {
 
   DATABASE_CLUSTER_URL: `mongodb+srv://${process.env.MONGO_USER}:${
     process.env.MONGO_PASSWORD
-  }@deliveryclubcluster-h2q0w.mongodb.net/test?retryWrites=true`
+  }@deliveryclubcluster-h2q0w.mongodb.net/${
+    process.env.MONGO_DATABASE_NAME_V1
+  }?retryWrites=true`
 };

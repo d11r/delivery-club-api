@@ -1,6 +1,7 @@
 {
   "env": {
     "MONGO_USER": "backend-api",
-    "MONGO_PASSWORD": "todayisabeautifulday"
+    "MONGO_PASSWORD": "todayisabeautifulday",
+    "MONGO_DATABASE_NAME_V1": "delivery-v1"
   }
 }

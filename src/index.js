@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import graphqlHttp from "express-graphql";
+import mongoose from "mongoose";
 import { buildSchema } from "graphql";
 
 import config from "../config/config";
@@ -57,4 +58,9 @@ app.use(
   })
 );
 
-app.listen(3000);
+mongoose
+  .connect(config.DATABASE_CLUSTER_URL, { useNewUrlParser: true })
+  .then(() => app.listen(3000))
+  .catch(err => {
+    throw new Error(err);
+  });

@@ -1,5 +1,11 @@
+import nodemon from "../nodemon.json";
+
 export default {
   ROOT_ENDPOINT: "/api",
   API_VERSION: "v1",
-  GRAPHQL_ENDPOINT: "graphql"
+  GRAPHQL_ENDPOINT: "graphql",
+
+  DATABASE_CLUSTER_URL: `mongodb+srv://${process.env.MONGO_USER}:${
+    process.env.MONGO_PASSWORD
+  }@deliveryclubcluster-h2q0w.mongodb.net/test?retryWrites=true`
 };

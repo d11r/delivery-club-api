@@ -7,17 +7,32 @@ import config from "../config/config";
 
 const app = express();
 
+const dishes = [];
+
 app.use(bodyParser.json());
 app.use(
   `${config.ROOT_ENDPOINT}/${config.API_VERSION}/${config.GRAPHQL_ENDPOINT}`,
   graphqlHttp({
     schema: buildSchema(`
+      type Dish {
+        _id: ID!
+        name: String!
+        description: String!
+        price: Float!
+      }
+
+      input DishParams {
+        name: String!
+        description: String!
+        price: Float!
+      }
+
       type RootQuery {
-        users: [String!]!
+        dishes: [Dish!]!
       }
 
       type RootMutation {
-        createUser(name: String): String
+        createDish(dishInput: DishParams): Dish
       }
 
       schema {
@@ -26,8 +41,17 @@ app.use(
       }
     `),
     rootValue: {
-      users: () => ["ezio", "daniil", "vlad"],
-      createUser: args => args.name
+      dishes: () => dishes,
+      createDish: args => {
+        const newDish = {
+          _id: Math.random().toString(),
+          name: args.dishInput.name,
+          description: args.dishInput.description,
+          price: +args.dishInput.price
+        };
+        dishes.push(newDish);
+        return newDish;
+      }
     },
     graphiql: true
   })

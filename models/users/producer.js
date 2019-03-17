@@ -1,11 +1,29 @@
 import mongoose from "mongoose";
 
-import User from "./user";
-
 const { Schema } = mongoose;
 
 const producerSchema = new Schema({
-  createdDishes: [
+  email: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  business_address: {
+    type: String,
+    required: false
+  },
+  website_address: {
+    type: String,
+    required: false
+  },
+  phone_number: {
+    type: String,
+    required: false
+  },
+  created_dishes: [
     {
       type: Schema.Types.ObjectId,
       ref: "Dish"
@@ -13,6 +31,4 @@ const producerSchema = new Schema({
   ]
 });
 
-User.Producer = mongoose.model("Producer", producerSchema, "users");
-
-module.exports = User.Producer;
+module.exports = mongoose.model("Producer", producerSchema);

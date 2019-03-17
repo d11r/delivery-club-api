@@ -1,11 +1,33 @@
 import mongoose from "mongoose";
 
-import User from "./user";
-
 const { Schema } = mongoose;
 
 const consumerSchema = new Schema({
-  orderedDishes: [
+  email: {
+    type: String,
+    required: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  first_name: {
+    type: String,
+    required: false
+  },
+  last_name: {
+    type: String,
+    required: false
+  },
+  address: {
+    type: String,
+    required: false
+  },
+  phone_number: {
+    type: String,
+    required: false
+  },
+  ordered_dishes: [
     {
       type: Schema.Types.ObjectId,
       ref: "Dish"
@@ -13,6 +35,4 @@ const consumerSchema = new Schema({
   ]
 });
 
-User.Consumer = mongoose.model("Consumer", consumerSchema, "users");
-
-module.exports = User.Consumer;
+module.exports = mongoose.model("Consumer", consumerSchema);

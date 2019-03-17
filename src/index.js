@@ -6,10 +6,12 @@ import mongoose from "mongoose";
 import graphQlSchema from "../graphql/schema/index";
 import graphQlResolvers from "../graphql/resolvers/index";
 import config from "../config/config";
+import isAuth from "../middleware/is-auth";
 
 const app = express();
 
 app.use(bodyParser.json());
+app.use(isAuth);
 
 app.use(
   `${config.ROOT_ENDPOINT}/${config.API_VERSION}/${config.GRAPHQL_ENDPOINT}`,

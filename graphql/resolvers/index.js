@@ -2,11 +2,13 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 import responseHelper from "../../helpers/producer-helper";
 import Dish from "../../models/dish";
 import Producer from "../../models/users/producer";
 import Consumer from "../../models/users/consumer";
+import config from "../../config/config";
 
 const dishes = dishIds => {
   return Dish.find({ _id: { $in: dishIds } })
@@ -32,6 +34,34 @@ const producer = producerId => {
     .catch(err => {
       throw err;
     });
+};
+
+const login = async (type, email, password) => {
+  const user =
+    type === "producer"
+      ? await Producer.findOne({ email })
+      : await Consumer.findOne({ email });
+  if (!user) {
+    throw new Error(responseHelper.INVALID_EMAIL);
+  }
+  const isEqual = await bcrypt.compare(password, user.password);
+  if (!isEqual) {
+    throw new Error(responseHelper.INVALID_EMAIL_PASSWORD_COMBINATION);
+  }
+  const token = jwt.sign(
+    { user_id: user.id, email: user.email },
+    config.SECRET_KEY,
+    {
+      expiresIn: "2h"
+    }
+  );
+
+  return {
+    user_id: user.id,
+    token,
+    user_type: type,
+    token_expiration: 1
+  };
 };
 
 module.exports = {
@@ -70,12 +100,15 @@ module.exports = {
       .catch(err => {
         throw err;
       }),
-  createDish: args => {
+  createDish: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error(responseHelper.ACTION_NOT_AUTHORIZED);
+    }
     const dish = new Dish({
       name: args.dishInput.name,
       description: args.dishInput.description,
       price: +args.dishInput.price,
-      creator: "5c8d761aebdd113b6d46db5f"
+      creator: req.user_id
     });
 
     let createdDish;
@@ -87,7 +120,7 @@ module.exports = {
           _id: result._doc._id.toString(),
           creator: producer.bind(this, result._doc.creator)
         };
-        return Producer.findById("5c8d761aebdd113b6d46db5f");
+        return Producer.findById(req.user_id);
       })
       .then(user => {
         if (!user) {
@@ -111,7 +144,7 @@ module.exports = {
       })
       .then(hashPassword => {
         const prod = new Producer({
-          email: args.producerInput.email,
+          email: args.producerInput.email.trim(),
           password: hashPassword,
           phone_number: args.producerInput.phone_number,
           business_address: args.producerInput.business_address,
@@ -138,7 +171,7 @@ module.exports = {
       })
       .then(hashPassword => {
         const consumer = new Consumer({
-          email: args.consumerInput.email,
+          email: args.consumerInput.email.trim(),
           password: hashPassword,
           first_name: args.consumerInput.first_name,
           last_name: args.consumerInput.last_name,
@@ -154,5 +187,9 @@ module.exports = {
       .catch(err => {
         throw err;
       });
-  }
+  },
+  producerLogin: async ({ email, password }) =>
+    login("producer", email.trim(), password),
+  consumerLogin: async ({ email, password }) =>
+    login("consumer", email.trim(), password)
 };

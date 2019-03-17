@@ -9,6 +9,13 @@ module.exports = buildSchema(`
     creator: Producer!
   }
 
+  type AuthData {
+    user_id: ID!
+    token: String!
+    user_type: String!
+    token_expiration: Int!
+  }
+
   type Producer {
     _id: ID!
     email: String!
@@ -56,6 +63,8 @@ module.exports = buildSchema(`
     dishes: [Dish!]!
     producers: [Producer!]!
     consumers: [Consumer!]!
+    producerLogin(email: String!, password: String!): AuthData!
+    consumerLogin(email: String!, password: String!): AuthData!
   }
 
   type RootMutation {

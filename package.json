@@ -7,6 +7,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-graphql": "^0.7.1",
     "google-auth-library": "^3.1.0",
@@ -32,5 +33,6 @@
   },
   "scripts": {
     "start": "nodemon --exec babel-node -- src/index.js"
-  }
+  },
+  "proxy": "http://localhost:3000"
 }

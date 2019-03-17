@@ -32,7 +32,8 @@
     "prettier": "^1.16.4"
   },
   "scripts": {
-    "start": "nodemon --exec babel-node -- src/index.js"
+    "start": "babel-node -- src/index.js",
+    "dev-start": "nodemon --exec babel-node -- src/index.js"
   },
   "proxy": "http://localhost:3000"
 }

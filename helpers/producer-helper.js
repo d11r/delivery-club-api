@@ -8,5 +8,9 @@ export default {
   INVALID_EMAIL: "Invalid E-Mail",
   INVALID_EMAIL_PASSWORD_COMBINATION:
     "Invalid combination of E-mail and password.",
-  ACTION_NOT_AUTHORIZED: "Action not authorized."
+  ACTION_NOT_AUTHORIZED: "Action not authorized.",
+  GOOGLE_ACCOUNT_TOKEN_NOT_VALID: "Google Token provided is not valid.",
+  USER_NOT_SIGNED_UP:
+    "User with email specified is not registered in the database",
+  GOOGLE_TOKEN_EXPIRED: "Your Google Token has expired."
 };

@@ -9,7 +9,7 @@ const producerSchema = new Schema({
   },
   password: {
     type: String,
-    required: true
+    required: false
   },
   business_address: {
     type: String,

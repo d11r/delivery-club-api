@@ -188,8 +188,98 @@ module.exports = {
         throw err;
       });
   },
+  createProducerGoogle: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error(responseHelper.GOOGLE_ACCOUNT_TOKEN_NOT_VALID);
+    }
+
+    return Producer.findOne({ email: req.userEmail })
+      .then(user => {
+        if (user) {
+          throw new Error(responseHelper.PRODUCER_ALREADY_EXISTS);
+        }
+
+        const prod = new Producer({
+          email: req.userEmail
+        });
+
+        return prod.save();
+      })
+      .then(result => ({
+        ...result._doc,
+        _id: result._doc._id.toString()
+      }))
+      .catch(err => {
+        throw err;
+      });
+  },
+
+  createConsumerGoogle: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error(responseHelper.GOOGLE_ACCOUNT_TOKEN_NOT_VALID);
+    }
+
+    return Consumer.findOne({ email: req.userEmail })
+      .then(user => {
+        if (user) {
+          throw new Error(responseHelper.CONSUMER_ALREADY_EXISTS);
+        }
+
+        const cons = new Consumer({
+          email: req.userEmail,
+          first_name: req.userName.split(" ")[0],
+          last_name: req.userName.split(" ")[1]
+        });
+
+        return cons.save();
+      })
+      .then(result => ({
+        ...result._doc,
+        _id: result._doc._id.toString()
+      }))
+      .catch(err => {
+        throw err;
+      });
+  },
+
   producerLogin: async ({ email, password }) =>
     login("producer", email.trim(), password),
   consumerLogin: async ({ email, password }) =>
-    login("consumer", email.trim(), password)
+    login("consumer", email.trim(), password),
+
+  producerLoginGoogle: async (args, req) => {
+    if (req.tokenExpired) {
+      throw new Error(responseHelper.GOOGLE_TOKEN_EXPIRED);
+    }
+    if (!req.isAuth) {
+      throw new Error(responseHelper.GOOGLE_ACCOUNT_TOKEN_NOT_VALID);
+    }
+    const user = await Producer.findOne({ email: req.userEmail });
+    if (!user) {
+      throw new Error(responseHelper.USER_NOT_SIGNED_UP);
+    }
+
+    return {
+      user_id: user.id,
+      user_type: "producer"
+    };
+  },
+  consumerLoginGoogle: async (args, req) => {
+    if (req.tokenExpired) {
+      throw new Error(responseHelper.GOOGLE_TOKEN_EXPIRED);
+    }
+    if (!req.isAuth) {
+      throw new Error(responseHelper.GOOGLE_ACCOUNT_TOKEN_NOT_VALID);
+    }
+
+    const user = await Consumer.findOne({ email: req.userEmail });
+    if (!user) {
+      throw new Error(responseHelper.USER_NOT_SIGNED_UP);
+    }
+
+    return {
+      user_id: user.id,
+      user_type: "consumer"
+    };
+  }
 };

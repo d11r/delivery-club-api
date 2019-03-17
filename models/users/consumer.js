@@ -9,7 +9,7 @@ const consumerSchema = new Schema({
   },
   password: {
     type: String,
-    required: true
+    required: false
   },
   first_name: {
     type: String,

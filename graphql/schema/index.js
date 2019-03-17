@@ -65,12 +65,16 @@ module.exports = buildSchema(`
     consumers: [Consumer!]!
     producerLogin(email: String!, password: String!): AuthData!
     consumerLogin(email: String!, password: String!): AuthData!
+    producerLoginGoogle: AuthData!
+    consumerLoginGoogle: AuthData!
   }
 
   type RootMutation {
     createDish(dishInput: DishParams): Dish
     createProducer(producerInput: ProducerParams): Producer
     createConsumer(consumerInput: ConsumerParams): Consumer
+    createProducerGoogle: Producer
+    createConsumerGoogle: Consumer
   }
 
   schema {

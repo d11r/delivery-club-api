@@ -42,6 +42,12 @@ module.exports = buildSchema(`
     price: Float!
   }
 
+  input DishEditParams {
+    name: String
+    description: String
+    price: Float
+  }
+
   input ProducerParams {
     email: String!
     password: String!
@@ -72,7 +78,7 @@ module.exports = buildSchema(`
 
   type RootMutation {
     createDish(dishInput: DishParams): Dish
-    updateDish(dishId: ID!, dishInput: DishParams): Dish!
+    updateDish(dishId: ID!, dishInput: DishEditParams): Dish!
     removeDish(dishId: ID!): Dish!
     createProducer(producerInput: ProducerParams): Producer
     createConsumer(consumerInput: ConsumerParams): Consumer

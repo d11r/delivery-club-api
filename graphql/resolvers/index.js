@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
@@ -87,7 +88,8 @@ module.exports = {
 
         return {
           ...d._doc,
-          _id: d.id
+          _id: d.id,
+          creator: producer.bind(this, d._doc.creator)
         };
       })
       .catch(err => {
@@ -147,6 +149,49 @@ module.exports = {
         return user.save();
       })
       .then(_ => createdDish)
+      .catch(err => {
+        throw err;
+      });
+  },
+  updateDish: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error(responseHelper.ACTION_NOT_AUTHORIZED);
+    }
+
+    return Dish.findById(mongoose.Types.ObjectId(args.dishId))
+      .then(d => {
+        if (!d) {
+          throw new Error(responseHelper.DISH_DOESNT_EXIST);
+        }
+        return d;
+      })
+      .then(d => {
+        Object.entries(args.dishInput).forEach(entry => {
+          const key = entry[0];
+          const value = entry[1];
+
+          d[key] = value;
+        });
+        return d;
+      })
+      .then(d => {
+        return Producer.findById(mongoose.Types.ObjectId(d.creator))
+          .then(user => {
+            if (user.email !== req.userEmail) {
+              throw new Error(responseHelper.ACTION_FORBIDDEN);
+            }
+
+            return d.save();
+          })
+          .catch(err => {
+            throw err;
+          });
+      })
+      .then(d => ({
+        ...d._doc,
+        _id: d.id,
+        creator: producer.bind(this, d._doc.creator)
+      }))
       .catch(err => {
         throw err;
       });

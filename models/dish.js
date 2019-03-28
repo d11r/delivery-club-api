@@ -18,7 +18,13 @@ const dishSchema = new Schema({
   creator: {
     type: Schema.Types.ObjectId,
     ref: "Producer"
-  }
+  },
+  categories: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Category"
+    }
+  ]
 });
 
 module.exports = mongoose.model("Dish", dishSchema);

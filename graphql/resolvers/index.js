@@ -409,52 +409,31 @@ module.exports = {
         throw err;
       });
   },
-  addDishToCategory: (args, req) => {
-    let dishToAdd;
-    let foundDish;
-    let foundCategory;
+  addDishToCategory: async (args, req) => {
+    const dish = await Dish.findById(mongoose.Types.ObjectId(args.dishId));
+    const cate = await Category.findById(
+      mongoose.Types.ObjectId(args.categoryId)
+    );
 
-    return Dish.findById(mongoose.Types.ObjectId(args.dishId))
-      .then(dish => {
-        if (!dish) {
-          throw new Error(responseHelper.DISH_DOESNT_EXIST);
-        }
+    if (!dish) {
+      throw new Error(responseHelper.DISH_DOESNT_EXIST);
+    }
 
-        foundDish = dish;
-        dishToAdd = {
-          ...dish._doc,
-          _id: dish._doc._id.toString(),
-          creator: producer.bind(this, dish._doc.creator)
-        };
-        return Category.findById(mongoose.Types.ObjectId(args.categoryId));
-      })
-      .then(cat => {
-        if (!cat) {
-          throw new Error(responseHelper.CATEGORY_DOESNT_EXIST);
-        }
+    if (!cate) {
+      throw new Error(responseHelper.CATEGORY_DOESNT_EXIST);
+    }
 
-        foundCategory = cat;
-        cat.dishes.push(foundDish);
-        return cat.save();
-      })
-      .then(_ => {
-        if (!foundDish.categories) foundDish.categories = [];
-        foundDish.categories.push(foundCategory);
+    cate.dishes.push(dish);
+    dish.categories.push(cate);
 
-        // console.log(foundDish);
-        // console.log(foundCategory);
+    const newCategory = await cate.save();
+    const newDish = await dish.save();
 
-        return foundDish.update({
-          categories: foundDish.categories.concat(foundCategory)
-        });
-      })
-      .then(_ => {
-        console.log(_);
-        return dishToAdd;
-      })
-      .catch(err => {
-        throw err;
-      });
+    return {
+      ...newDish._doc,
+      _id: newDish.id,
+      categories: categories.bind(this, newDish._doc.categories)
+    };
   },
   categories: () =>
     Category.find()

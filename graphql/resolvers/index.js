@@ -10,6 +10,8 @@ import responseHelper from "../../helpers/producer-helper";
 import Dish from "../../models/dish";
 import Producer from "../../models/users/producer";
 import Consumer from "../../models/users/consumer";
+import Category from "../../models/category";
+
 import config from "../../config/config";
 
 const dishes = dishIds => {
@@ -18,7 +20,10 @@ const dishes = dishIds => {
       dishObjects.map(dish => ({
         ...dish._doc,
         _id: dish.id,
-        creator: producer.bind(this, dish.creator)
+        creator: producer.bind(this, dish.creator),
+        categories: dish.categories
+          ? categories.bind(this, dish.categories)
+          : []
       }))
     )
     .catch(err => {
@@ -36,6 +41,16 @@ const producer = producerId => {
     .catch(err => {
       throw err;
     });
+};
+
+const categories = categoryIds => {
+  return Category.find({ _id: { $in: categoryIds } }).then(categoryObjects =>
+    categoryObjects.map(cat => ({
+      ...cat._doc,
+      _id: cat.id,
+      dishes: dishes.bind(this, cat._doc.dishes)
+    }))
+  );
 };
 
 const login = async (type, email, password) => {
@@ -73,7 +88,8 @@ module.exports = {
         listOfDishes.map(dish => ({
           ...dish._doc,
           _id: dish.id,
-          creator: producer.bind(this, dish._doc.creator)
+          creator: producer.bind(this, dish._doc.creator),
+          categories: categories.bind(this, dish._doc.categories)
         }))
       )
       .catch(err => {
@@ -89,7 +105,10 @@ module.exports = {
         return {
           ...d._doc,
           _id: d.id,
-          creator: producer.bind(this, d._doc.creator)
+          creator: producer.bind(this, d._doc.creator),
+          categories: d._doc.categories
+            ? categories.bind(this, d._doc.categories)
+            : []
         };
       })
       .catch(err => {
@@ -127,7 +146,8 @@ module.exports = {
       name: args.dishInput.name,
       description: args.dishInput.description,
       price: +args.dishInput.price,
-      creator: req.user_id
+      creator: req.user_id,
+      categories: []
     });
 
     let createdDish;
@@ -375,5 +395,94 @@ module.exports = {
       user_id: user.id,
       user_type: "consumer"
     };
+  },
+  createCategory: (args, req) => {
+    return new Category({
+      name: args.name
+    })
+      .save()
+      .then(result => ({
+        ...result._doc,
+        _id: result._doc._id.toString()
+      }))
+      .catch(err => {
+        throw err;
+      });
+  },
+  addDishToCategory: (args, req) => {
+    let dishToAdd;
+    let foundDish;
+    let foundCategory;
+
+    return Dish.findById(mongoose.Types.ObjectId(args.dishId))
+      .then(dish => {
+        if (!dish) {
+          throw new Error(responseHelper.DISH_DOESNT_EXIST);
+        }
+
+        foundDish = dish;
+        dishToAdd = {
+          ...dish._doc,
+          _id: dish._doc._id.toString(),
+          creator: producer.bind(this, dish._doc.creator)
+        };
+        return Category.findById(mongoose.Types.ObjectId(args.categoryId));
+      })
+      .then(cat => {
+        if (!cat) {
+          throw new Error(responseHelper.CATEGORY_DOESNT_EXIST);
+        }
+
+        foundCategory = cat;
+        cat.dishes.push(foundDish);
+        return cat.save();
+      })
+      .then(_ => {
+        if (!foundDish.categories) foundDish.categories = [];
+        foundDish.categories.push(foundCategory);
+
+        // console.log(foundDish);
+        // console.log(foundCategory);
+
+        return foundDish.update({
+          categories: foundDish.categories.concat(foundCategory)
+        });
+      })
+      .then(_ => {
+        console.log(_);
+        return dishToAdd;
+      })
+      .catch(err => {
+        throw err;
+      });
+  },
+  categories: () =>
+    Category.find()
+      .then(listOfCategories =>
+        listOfCategories.map(cat => ({
+          ...cat._doc,
+          _id: cat.id,
+          dishes: dishes.bind(this, cat._doc.dishes)
+        }))
+      )
+      .catch(err => {
+        throw err;
+      }),
+  category: (args, req) => {
+    return Category.findById(mongoose.Types.ObjectId(args.categoryId))
+      .then(c => {
+        if (!c) {
+          throw new Error(responseHelper.CATEGORY_DOESNT_EXIST);
+        }
+
+        return {
+          ...c._doc,
+          _id: c.id,
+          dishes: dishes.bind(this, c._doc.dishes)
+        };
+      })
+      .catch(err => {
+        throw err;
+      });
   }
 };

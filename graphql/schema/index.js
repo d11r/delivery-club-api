@@ -7,6 +7,13 @@ module.exports = buildSchema(`
     description: String!
     price: Float!
     creator: Producer!
+    categories: [Category!]
+  }
+
+  type Category {
+    _id: ID!
+    name: String!
+    dishes: [Dish!]
   }
 
   type AuthData {
@@ -74,6 +81,8 @@ module.exports = buildSchema(`
     consumerLogin(email: String!, password: String!): AuthData!
     producerLoginGoogle: AuthData!
     consumerLoginGoogle: AuthData!
+    categories: [Category!]!
+    category(categoryId: ID!): Category
   }
 
   type RootMutation {
@@ -84,6 +93,8 @@ module.exports = buildSchema(`
     createConsumer(consumerInput: ConsumerParams): Consumer
     createProducerGoogle: Producer
     createConsumerGoogle: Consumer
+    createCategory(name: String): Category!
+    addDishToCategory(dishId: ID!, categoryId: ID!): Dish!
   }
 
   schema {

@@ -15,5 +15,6 @@ export default {
   GOOGLE_TOKEN_EXPIRED: "Your Google Token has expired.",
   DISH_DOESNT_EXIST: "A dish with the ID specified does not exist.",
   ACTION_FORBIDDEN:
-    "You don't own the necessary rights to perform this operation"
+    "You don't own the necessary rights to perform this operation",
+  CATEGORY_DOESNT_EXIST: "A category with the ID specified does not exist"
 };

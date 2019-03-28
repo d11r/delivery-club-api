@@ -3,6 +3,7 @@
 /* eslint-disable no-underscore-dangle */
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 import responseHelper from "../../helpers/producer-helper";
 import Dish from "../../models/dish";
@@ -77,6 +78,22 @@ module.exports = {
       .catch(err => {
         throw err;
       }),
+  dish: (args, req) => {
+    return Dish.findById(mongoose.Types.ObjectId(args.dishId))
+      .then(d => {
+        if (!d) {
+          throw new Error(responseHelper.DISH_DOESNT_EXIST);
+        }
+
+        return {
+          ...d._doc,
+          _id: d.id
+        };
+      })
+      .catch(err => {
+        throw err;
+      });
+  },
   consumers: () =>
     Consumer.find()
       .then(consumers =>

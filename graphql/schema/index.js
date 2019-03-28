@@ -61,6 +61,7 @@ module.exports = buildSchema(`
 
   type RootQuery {
     dishes: [Dish!]!
+    dish(dishId: ID!): Dish
     producers: [Producer!]!
     consumers: [Consumer!]!
     producerLogin(email: String!, password: String!): AuthData!
@@ -71,6 +72,8 @@ module.exports = buildSchema(`
 
   type RootMutation {
     createDish(dishInput: DishParams): Dish
+    updateDish(dishId: ID!, dishInput: DishParams): Dish!
+    removeDish(dishId: ID!): Dish!
     createProducer(producerInput: ProducerParams): Producer
     createConsumer(consumerInput: ConsumerParams): Consumer
     createProducerGoogle: Producer

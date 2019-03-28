@@ -4,7 +4,7 @@
 /* eslint-disable no-underscore-dangle */
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 
 import responseHelper from "../../helpers/producer-helper";
 import Dish from "../../models/dish";
@@ -186,6 +186,38 @@ module.exports = {
           .catch(err => {
             throw err;
           });
+      })
+      .then(d => ({
+        ...d._doc,
+        _id: d.id,
+        creator: producer.bind(this, d._doc.creator)
+      }))
+      .catch(err => {
+        throw err;
+      });
+  },
+  removeDish: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error(responseHelper.ACTION_NOT_AUTHORIZED);
+    }
+
+    return Dish.findById(mongoose.Types.ObjectId(args.dishId))
+      .then(d => {
+        if (!d) {
+          throw new Error(responseHelper.DISH_DOESNT_EXIST);
+        }
+        return d;
+      })
+      .then(d => {
+        return Producer.findById(mongoose.Types.ObjectId(d.creator)).then(
+          user => {
+            if (user.email !== req.userEmail) {
+              throw new Error(responseHelper.ACTION_FORBIDDEN);
+            }
+
+            return d.remove();
+          }
+        );
       })
       .then(d => ({
         ...d._doc,

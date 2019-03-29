@@ -5,6 +5,10 @@
   "author": "Dragos Strugar <itsdragos@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^10.0.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
@@ -15,13 +19,10 @@
     "graphql": "^14.1.1",
     "jsonwebtoken": "^8.5.0",
     "mongoose": "^5.4.19",
-    "babel-cli": "^6.26.0",
-    "babel-eslint": "^10.0.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
     "nodemon": "^1.18.10"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "eslint": "^5.15.2",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^4.1.0",
@@ -29,11 +30,14 @@
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-react": "^7.12.4",
-    "prettier": "^1.16.4"
+    "mocha": "^6.0.2",
+    "prettier": "^1.16.4",
+    "supertest": "^4.0.2"
   },
   "scripts": {
     "start": "nodemon --exec babel-node -- src/index.js",
-    "dev-start": "nodemon --exec babel-node -- src/index.js"
+    "dev-start": "nodemon --exec babel-node -- src/index.js",
+    "test": "mocha --require babel-polyfill --require babel-register test/*.test.js"
   },
   "proxy": "http://localhost:3000"
 }

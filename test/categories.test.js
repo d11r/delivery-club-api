@@ -20,7 +20,7 @@ describe(chalk.inverse("Categories Tests:"), () => {
         done();
       });
   });
-  it("Try to create new category [\"Test\" category]", done => {
+  /*it("Try to create new category [\"Test\" category]", done => {
     request
       .post("/")
       .send({
@@ -33,5 +33,5 @@ describe(chalk.inverse("Categories Tests:"), () => {
         expect(res.body.data.createCategory.name).to.equal("Test");
         done();
       });
-  });
+  });*/
 });

@@ -13,6 +13,21 @@ describe(chalk.inverse("User Tests:"), () => {
 
   // Tests for Food Consumers
   describe("Food Consumers Tests:", () => {
+
+    it('Logging as consumer ["someemail@yandex.ru":"somepass"]', done => {
+      request
+        .get("/")
+        .send({
+          query:
+            '{ consumerLogin(email: "someemail@yandex.ru", password: "somepass") { token } }'
+        })
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.data.consumerLogin).to.be.an("object");
+          done();
+        });
+    });
+
     it("Return all consumers [Type = Array]", done => {
       request
         .get("/")
@@ -24,6 +39,7 @@ describe(chalk.inverse("User Tests:"), () => {
           done();
         });
     });
+
     it("Try to create consumer that exist in db [Get \"Already exist\" message]", done => {
       request
         .post("/")
@@ -42,6 +58,7 @@ describe(chalk.inverse("User Tests:"), () => {
           done();
         });
     });
+
     it("Try to create consumer via Google [Get \"Wrong token\" message]", done => {
       request
         .post("/")
@@ -58,10 +75,23 @@ describe(chalk.inverse("User Tests:"), () => {
           done();
         });
     });
+
   });
 
   // Tests for Food Producers
   describe("Food Producers Tests:", () => {
+
+    it("Logging as producer [\"someemail@yandex.ru\":\"somepass\"]", done => {
+      request
+        .get("/")
+        .send({ query: "{ producerLogin(email: \"someemail@yandex.ru\", password: \"somepass\") { token } }" })
+        .expect(200)
+        .end((err, res) => {
+          expect(res.body.data.producerLogin).to.be.an("object");
+          done();
+        });
+    });
+
     it("Return all producers [Type = Array]", done => {
       request
         .get("/")
@@ -73,6 +103,7 @@ describe(chalk.inverse("User Tests:"), () => {
           done();
         });
     });
+
     it("Try to create producer that exist in db [Get \"Already exist\" message]", done => {
       request
         .post("/")
@@ -91,6 +122,7 @@ describe(chalk.inverse("User Tests:"), () => {
           done();
         });
     });
+
     it("Try to create producer via Google [Get \"Wrong token\" message]", done => {
       request
         .post("/")
@@ -107,6 +139,7 @@ describe(chalk.inverse("User Tests:"), () => {
           done();
         });
     });
+
   });
 
 });

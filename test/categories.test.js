@@ -9,6 +9,7 @@ const request = require("supertest")("localhost:3000/api/v1/graphql");
 
 // Tests for Categories
 describe(chalk.inverse("Categories Tests:"), () => {
+
   it("Return all categories [Type = Array]", done => {
     request
       .get("/")
@@ -20,7 +21,8 @@ describe(chalk.inverse("Categories Tests:"), () => {
         done();
       });
   });
-  /*it("Try to create new category [\"Test\" category]", done => {
+
+  it("Create new category [\"Test\" category]", done => {
     request
       .post("/")
       .send({
@@ -33,5 +35,6 @@ describe(chalk.inverse("Categories Tests:"), () => {
         expect(res.body.data.createCategory.name).to.equal("Test");
         done();
       });
-  });*/
+  });
+
 });

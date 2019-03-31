@@ -17,7 +17,20 @@ describe(chalk.inverse("Categories Tests:"), () => {
       .end((err, res) => {
         if (err) return done(err);
         expect(res.body.data.categories).to.be.an("array");
-        // expect(res.body.data.categories).to.have.lengthOf(5);
+        done();
+      });
+  });
+  it("Try to create new category [\"Test\" category]", done => {
+    request
+      .post("/")
+      .send({
+        query:
+          'mutation { createCategory(name: "Test") { name } }'
+      })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body.data.createCategory.name).to.equal("Test");
         done();
       });
   });

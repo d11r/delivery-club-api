@@ -17,7 +17,6 @@ describe(chalk.inverse("Dishes Tests:"), () => {
       .end((err, res) => {
         if (err) return done(err);
         expect(res.body.data.dishes).to.be.an("array");
-        // expect(res.body.data.dishes).to.have.lengthOf(5);
         done();
       });
   });

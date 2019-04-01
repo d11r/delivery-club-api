@@ -2,6 +2,7 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
+/* eslint-disable no-param-reassign */
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose, { mongo } from "mongoose";

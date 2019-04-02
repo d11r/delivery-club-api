@@ -2,6 +2,9 @@
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 
+import Producer from "../models/users/producer";
+import Consumer from "../models/users/consumer";
+
 import config from "../config/config";
 
 const client = new OAuth2Client(config.CLIENT_ID);
@@ -32,6 +35,18 @@ module.exports = async (req, res, next) => {
     req.isAuth = true;
     req.userEmail = payload.email;
     req.userName = payload.name;
+
+    // populate user's id
+    const user = await Producer.findOne({ email: req.userEmail });
+    if (user) {
+      req.user_id = user.id;
+    } else {
+      const consumer = await Consumer.findOne({ email: req.userEmail });
+      if (consumer) {
+        req.user_id = consumer.id;
+      }
+    }
+
     return next();
   }
 

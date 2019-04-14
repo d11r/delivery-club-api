@@ -125,8 +125,13 @@ module.exports = {
         if(!args.key){
           args.key = 'name';
         }
-        const comparator = getDishComparator(args.key);
-        return dishes.sort(comparator);
+      
+        return dishes.sort(getDishComparator(args.key)).map(dish => ({
+          ...dish._doc,
+          _id: dish.id,
+          creator: producer.bind(this, dish._doc.creator),
+          categories: categories.bind(this, dish._doc.categories)
+        }));
       })
       .catch(err => {
         throw err;

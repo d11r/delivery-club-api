@@ -82,6 +82,29 @@ const login = async (type, email, password) => {
   };
 };
 
+/**
+ * Get a comparator function which specifies the order of two objects depending on specific field (key).
+ * This compare function then can be passed to Array.sort(comparator) to sort an array of objects by the key.
+ * 
+ * @param key The key on which the returned function should compare the objects
+ * @returns   Function which returns -1, 0 or 1 based on the order relation 
+ *            of the corresponding field of the objects, specified by key
+ */
+const getDishComparator = key => {
+  return (dish1, dish2) => {
+    let key1 = dish1[key];
+    let key2 = dish2[key];
+
+    // If the field is of string type, convert both fields to lower case
+    if(key1 + '' === key1) {
+      key1 = key1.toLowerCase();
+      key2 = key2.toLowerCase();
+    }
+
+    return key1 === key2 ? 0 : key1 > key2 ? 1 : -1;
+  }
+};
+
 module.exports = {
   dishes: () =>
     Dish.find()
@@ -96,6 +119,19 @@ module.exports = {
       .catch(err => {
         throw err;
       }),
+  dishesSorted: (args) => {
+    return Dish.find()
+      .then(dishes => {
+        if(!args.key){
+          args.key = 'name';
+        }
+        const comparator = getDishComparator(args.key);
+        return dishes.sort(comparator);
+      })
+      .catch(err => {
+        throw err;
+      });
+  },
   dish: (args, req) => {
     return Dish.findById(mongoose.Types.ObjectId(args.dishId))
       .then(d => {

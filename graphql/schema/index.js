@@ -72,10 +72,17 @@ module.exports = buildSchema(`
     phone_number: String
   }
 
+  input DishFilterParams {
+    minPrice: Float
+    maxPrice: Float
+    categoriesIds: [ID]
+  }
+
   type RootQuery {
     dishes: [Dish!]!
     dish(dishId: ID!): Dish
     dishesSorted(key: String): [Dish!]!
+    dishesFiltered(filterInput: DishFilterParams): [Dish]!
     producers: [Producer!]!
     consumers: [Consumer!]!
     producerLogin(email: String!, password: String!): AuthData!

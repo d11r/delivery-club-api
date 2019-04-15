@@ -48,5 +48,4 @@ for storing and accessing data.
   ## Backend Developers  
   **Dragos Strugar, Peter Zaraharkin, Daniil Dvoryanov**   
   ## Frontend Developers 
-  # Developers
   Ezio Thapaliya, Vladislav Smirnov

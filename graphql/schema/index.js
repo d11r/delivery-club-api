@@ -75,6 +75,7 @@ module.exports = buildSchema(`
   type RootQuery {
     dishes: [Dish!]!
     dish(dishId: ID!): Dish
+    dishesSorted(key: String): [Dish!]!
     producers: [Producer!]!
     consumers: [Consumer!]!
     producerLogin(email: String!, password: String!): AuthData!

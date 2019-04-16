@@ -1,4 +1,5 @@
 /* eslint-disable prefer-const */
+/* eslint-disable prefer-template */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
@@ -101,7 +102,8 @@ const getDishComparator = key => {
       key2 = key2.toLowerCase();
     }
 
-    return key1 === key2 ? 0 : key1 > key2 ? 1 : -1;
+    let res = key1 > key2 ? 1 : -1;
+    return key1 === key2 ? 0 : res;
   }
 };
 
@@ -121,12 +123,55 @@ module.exports = {
       }),
   dishesSorted: (args) => {
     return Dish.find()
-      .then(dishes => {
+      .then(ds => {
         if(!args.key){
           args.key = 'name';
         }
       
-        return dishes.sort(getDishComparator(args.key)).map(dish => ({
+        return ds.sort(getDishComparator(args.key)).map(dish => ({
+          ...dish._doc,
+          _id: dish.id,
+          creator: producer.bind(this, dish._doc.creator),
+          categories: categories.bind(this, dish._doc.categories)
+        }));
+      })
+      .catch(err => {
+        throw err;
+      });
+  },
+  dishesFiltered: (args) => {
+    return Dish.find()
+      .then(ds => {
+        // Filtering by min price
+        if (args.filterInput.minPrice) {
+          let min = args.filterInput.minPrice;
+          ds = ds.filter(d => d.price > min);
+        }
+
+        // Filtering by max price
+        if (args.filterInput.maxPrice) {
+          let max = args.filterInput.maxPrice;
+          ds = ds.filter(d => d.price < max);
+        }
+
+        // Filtering by categories checked
+        if (args.filterInput.categoriesIds) {
+          let csIds = args.filterInput.categoriesIds;
+          ds = ds.filter(d => {
+            let l = csIds.length;
+
+            let dishCsIds = [];
+            d.categories.forEach(c => dishCsIds.push(c._id.toString()));
+
+            csIds.forEach(cId => {
+              l = dishCsIds.includes(cId) ? l - 1 : l;
+            });
+
+            return l === 0;
+          });
+        }
+
+        return ds.map(dish => ({
           ...dish._doc,
           _id: dish.id,
           creator: producer.bind(this, dish._doc.creator),

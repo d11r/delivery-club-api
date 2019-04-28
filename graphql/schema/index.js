@@ -42,6 +42,14 @@ module.exports = buildSchema(`
     address: String
     phone_number: String
   }
+  
+  type Order {
+    _id: ID!
+    dishes: [Dish!]!
+    consumer: Consumer!
+    producer: Producer!
+    totalCost: Int!
+  }
 
   input DishParams {
     name: String!
@@ -71,6 +79,12 @@ module.exports = buildSchema(`
     address: String
     phone_number: String
   }
+  
+  input OrderParams {
+    dishesIds: [ID!]!
+    producerId: ID!
+    consumerId: ID!
+  }
 
   input DishFilterParams {
     minPrice: Float
@@ -91,6 +105,7 @@ module.exports = buildSchema(`
     consumerLoginGoogle: AuthData!
     categories: [Category!]!
     category(categoryId: ID!): Category
+    orders: [Order!]!
   }
 
   type RootMutation {
@@ -99,6 +114,7 @@ module.exports = buildSchema(`
     removeDish(dishId: ID!): Dish!
     createProducer(producerInput: ProducerParams): Producer
     createConsumer(consumerInput: ConsumerParams): Consumer
+    createOrder(orderInput: OrderParams): Order
     createProducerGoogle: Producer
     createConsumerGoogle: Consumer
     createCategory(name: String): Category!

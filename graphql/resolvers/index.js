@@ -13,6 +13,7 @@ import Dish from "../../models/dish";
 import Producer from "../../models/users/producer";
 import Consumer from "../../models/users/consumer";
 import Category from "../../models/category";
+import Order from "../../models/order";
 
 import config from "../../config/config";
 
@@ -86,9 +87,9 @@ const login = async (type, email, password) => {
 /**
  * Get a comparator function which specifies the order of two objects depending on specific field (key).
  * This compare function then can be passed to Array.sort(comparator) to sort an array of objects by the key.
- * 
+ *
  * @param key The key on which the returned function should compare the objects
- * @returns   Function which returns -1, 0 or 1 based on the order relation 
+ * @returns   Function which returns -1, 0 or 1 based on the order relation
  *            of the corresponding field of the objects, specified by key
  */
 const getDishComparator = key => {
@@ -127,7 +128,7 @@ module.exports = {
         if(!args.key){
           args.key = 'name';
         }
-      
+
         return ds.sort(getDishComparator(args.key)).map(dish => ({
           ...dish._doc,
           _id: dish.id,
@@ -220,6 +221,18 @@ module.exports = {
           ...prod._doc,
           _id: prod._doc._id.toString(),
           created_dishes: dishes.bind(this, prod._doc.created_dishes)
+        }))
+      )
+      .catch(err => {
+        throw err;
+      }),
+  orders: () =>
+    Order.find()
+      .then(orders =>
+        orders.map(prod => ({
+          ...prod._doc,
+          _id: prod._doc._id.toString(),
+          created_orders: orders.bind(this, prod._doc.created_orders)
         }))
       )
       .catch(err => {

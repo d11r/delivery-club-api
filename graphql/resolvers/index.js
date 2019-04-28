@@ -46,6 +46,18 @@ const producer = producerId => {
     });
 };
 
+const consumer = consumerId => {
+  return Consumer.findById(consumerId)
+    .then(user => ({
+      ...user._doc,
+      _id: user.id,
+      ordered_dishes: dishes.bind(this, user._doc.ordered_dishes)
+    }))
+    .catch(err => {
+      throw err;
+    });
+};
+
 const categories = categoryIds => {
   return Category.find({ _id: { $in: categoryIds } }).then(categoryObjects =>
     categoryObjects.map(cat => ({
@@ -398,6 +410,48 @@ module.exports = {
         ...result._doc,
         _id: result._doc._id.toString()
       }))
+      .catch(err => {
+        throw err;
+      });
+  },
+  createOrder: (args, req) => {
+    let totalPrice = 0;
+
+    args.dishes.forEach(dishID => {
+      let dish = Dish.findById(dishID);
+      let creatorMail = Consumer.findById(dish.consumer).email;
+
+      // TODO Sending notification mail to creator
+
+      totalPrice += dish.price;
+    });
+
+    const order = new Order({
+      dishes: args._doc.dishes,
+      consumer: req.user_id,
+      price: totalPrice
+    });
+
+    let createdOrder;
+    return order
+      .save()
+      .then(result => {
+        createdOrder = {
+          ...result._doc,
+          _id: result._doc._id.toString(),
+          dishes: dishes.bind(this, result._doc.dishes),
+          consumer: consumer.bind(this, req.user_id)
+        };
+        return Consumer.findById(req.user_id);
+      })
+      .then(user => {
+        if (!user) {
+          throw new Error(responseHelper.CONSUMER_DOESNT_EXIST);
+        }
+        user.ordered_dishes.push(args.dishes);
+        return user.save();
+      })
+      .then(_ => createdOrder)
       .catch(err => {
         throw err;
       });

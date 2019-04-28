@@ -16,5 +16,6 @@ export default {
   DISH_DOESNT_EXIST: "A dish with the ID specified does not exist.",
   ACTION_FORBIDDEN:
     "You don't own the necessary rights to perform this operation",
+  CONSUMER_DOESNT_EXIST: "A user with the ID specified does not exists",
   CATEGORY_DOESNT_EXIST: "A category with the ID specified does not exist"
 };

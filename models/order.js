@@ -10,10 +10,6 @@ const orderSchema = new Schema(
         ref: "Dish"
       }
     ],
-    producer: {
-      type: Schema.Types.ObjectId,
-      ref: "Producer"
-    },
     consumer: {
       type: Schema.Types.ObjectId,
       ref: "Consumer"

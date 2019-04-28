@@ -47,7 +47,6 @@ module.exports = buildSchema(`
     _id: ID!
     dishes: [Dish!]!
     consumer: Consumer!
-    producer: Producer!
     totalCost: Int!
   }
 
@@ -79,12 +78,6 @@ module.exports = buildSchema(`
     address: String
     phone_number: String
   }
-  
-  input OrderParams {
-    dishesIds: [ID!]!
-    producerId: ID!
-    consumerId: ID!
-  }
 
   input DishFilterParams {
     minPrice: Float
@@ -114,10 +107,10 @@ module.exports = buildSchema(`
     removeDish(dishId: ID!): Dish!
     createProducer(producerInput: ProducerParams): Producer
     createConsumer(consumerInput: ConsumerParams): Consumer
-    createOrder(orderInput: OrderParams): Order
     createProducerGoogle: Producer
     createConsumerGoogle: Consumer
     createCategory(name: String): Category!
+    createOrder(dishesIds: [ID!]!): Order
     addDishToCategory(dishId: ID!, categoryId: ID!): Dish!
   }
 

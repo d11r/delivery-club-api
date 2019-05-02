@@ -415,9 +415,9 @@ module.exports = {
       });
   },
   createOrder: (args, req) => {
-    let totalPrice = 0;
+    let totalPrice = 0.0;
 
-    args.dishes.forEach(dishID => {
+    args.dishesIds.forEach(dishID => {
       let dish = Dish.findById(dishID);
       let creatorMail = Consumer.findById(dish.consumer).email;
 
@@ -427,7 +427,7 @@ module.exports = {
     });
 
     const order = new Order({
-      dishes: args._doc.dishes,
+      dishes: args.dishesIds,
       consumer: req.user_id,
       price: totalPrice
     });

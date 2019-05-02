@@ -13,6 +13,7 @@ import Dish from "../../models/dish";
 import Producer from "../../models/users/producer";
 import Consumer from "../../models/users/consumer";
 import Category from "../../models/category";
+import Order from "../../models/order";
 
 import config from "../../config/config";
 
@@ -39,6 +40,18 @@ const producer = producerId => {
       ...user._doc,
       _id: user.id,
       created_dishes: dishes.bind(this, user._doc.created_dishes)
+    }))
+    .catch(err => {
+      throw err;
+    });
+};
+
+const consumer = consumerId => {
+  return Consumer.findById(consumerId)
+    .then(user => ({
+      ...user._doc,
+      _id: user.id,
+      ordered_dishes: dishes.bind(this, user._doc.ordered_dishes)
     }))
     .catch(err => {
       throw err;
@@ -86,9 +99,9 @@ const login = async (type, email, password) => {
 /**
  * Get a comparator function which specifies the order of two objects depending on specific field (key).
  * This compare function then can be passed to Array.sort(comparator) to sort an array of objects by the key.
- * 
+ *
  * @param key The key on which the returned function should compare the objects
- * @returns   Function which returns -1, 0 or 1 based on the order relation 
+ * @returns   Function which returns -1, 0 or 1 based on the order relation
  *            of the corresponding field of the objects, specified by key
  */
 const getDishComparator = key => {
@@ -127,7 +140,7 @@ module.exports = {
         if(!args.key){
           args.key = 'name';
         }
-      
+
         return ds.sort(getDishComparator(args.key)).map(dish => ({
           ...dish._doc,
           _id: dish.id,
@@ -220,6 +233,18 @@ module.exports = {
           ...prod._doc,
           _id: prod._doc._id.toString(),
           created_dishes: dishes.bind(this, prod._doc.created_dishes)
+        }))
+      )
+      .catch(err => {
+        throw err;
+      }),
+  orders: () =>
+    Order.find()
+      .then(orders =>
+        orders.map(prod => ({
+          ...prod._doc,
+          _id: prod._doc._id.toString(),
+          created_orders: orders.bind(this, prod._doc.created_orders)
         }))
       )
       .catch(err => {
@@ -385,6 +410,48 @@ module.exports = {
         ...result._doc,
         _id: result._doc._id.toString()
       }))
+      .catch(err => {
+        throw err;
+      });
+  },
+  createOrder: (args, req) => {
+    let totalPrice = 0;
+
+    args.dishes.forEach(dishID => {
+      let dish = Dish.findById(dishID);
+      let creatorMail = Consumer.findById(dish.consumer).email;
+
+      // TODO Sending notification mail to creator
+
+      totalPrice += dish.price;
+    });
+
+    const order = new Order({
+      dishes: args._doc.dishes,
+      consumer: req.user_id,
+      price: totalPrice
+    });
+
+    let createdOrder;
+    return order
+      .save()
+      .then(result => {
+        createdOrder = {
+          ...result._doc,
+          _id: result._doc._id.toString(),
+          dishes: dishes.bind(this, result._doc.dishes),
+          consumer: consumer.bind(this, req.user_id)
+        };
+        return Consumer.findById(req.user_id);
+      })
+      .then(user => {
+        if (!user) {
+          throw new Error(responseHelper.CONSUMER_DOESNT_EXIST);
+        }
+        user.ordered_dishes.push(args.dishes);
+        return user.save();
+      })
+      .then(_ => createdOrder)
       .catch(err => {
         throw err;
       });

@@ -42,6 +42,13 @@ module.exports = buildSchema(`
     address: String
     phone_number: String
   }
+  
+  type Order {
+    _id: ID!
+    dishes: [Dish!]!
+    consumer: Consumer!
+    totalCost: Int!
+  }
 
   input DishParams {
     name: String!
@@ -91,6 +98,7 @@ module.exports = buildSchema(`
     consumerLoginGoogle: AuthData!
     categories: [Category!]!
     category(categoryId: ID!): Category
+    orders: [Order!]!
   }
 
   type RootMutation {
@@ -102,6 +110,7 @@ module.exports = buildSchema(`
     createProducerGoogle: Producer
     createConsumerGoogle: Consumer
     createCategory(name: String): Category!
+    createOrder(dishesIds: [ID!]!): Order
     addDishToCategory(dishId: ID!, categoryId: ID!): Dish!
   }
 

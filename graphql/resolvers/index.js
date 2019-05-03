@@ -244,7 +244,7 @@ module.exports = {
         orders.map(prod => ({
           ...prod._doc,
           _id: prod._doc._id.toString(),
-          created_orders: orders.bind(this, prod._doc.created_orders)
+          dishes: dishes.bind(this, prod._doc.dishes)
         }))
       )
       .catch(err => {
@@ -417,13 +417,12 @@ module.exports = {
   createOrder: (args, req) => {
     let totalPrice = 0.0;
 
-    args.dishesIds.forEach(dishID => {
-      let dish = Dish.findById(dishID);
-      let creatorMail = Consumer.findById(dish.consumer).email;
+    args.dishesIds.forEach(async dishID => {
+      let dish = await Dish.findById(dishID);
+      totalPrice += await dish.price;
 
+      let creatorMail = await Consumer.findById(dish.creator).email;
       // TODO Sending notification mail to creator
-
-      totalPrice += dish.price;
     });
 
     const order = new Order({

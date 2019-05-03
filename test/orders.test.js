@@ -9,7 +9,7 @@ const request = require("supertest")("localhost:3000/api/v1/graphql");
 const responseHelper = require("../helpers/producer-helper");
 
 // Tests for Orders
-describe(chalk.inverse("Orders Tests:"), () => {
+/*describe(chalk.inverse("Orders Tests:"), () => {
 
   let token;
 
@@ -18,11 +18,11 @@ describe(chalk.inverse("Orders Tests:"), () => {
       .get("/")
       .send({
         query:
-          '{ producerLogin(email: "someemail@yandex.ru", password: "somepass") { token } }'
+          '{ consumerLogin(email: "someemail@yandex.ru", password: "somepass") { token } }'
       })
       .expect(200)
       .end((err, res) => {
-        ({ token } = res.body.data.producerLogin);
+        ({ token } = res.body.data.consumerLogin);
         done();
       });
   });
@@ -43,4 +43,4 @@ describe(chalk.inverse("Orders Tests:"), () => {
       });
   });
 
-});
+});*/
